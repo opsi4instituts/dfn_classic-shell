@@ -1,0 +1,99 @@
+;//TODO: Autoupdate
+
+; Created by Daniel Bacher (bacher@kit.edu)
+
+; Copyright (c) uib gmbh (www.uib.de)
+; This sourcecode is owned by uib
+; and published under the Terms of the General Public License.
+; credits: http://www.opsi.org/credits/
+requiredWinstVersion >= "4.11.4.3"
+
+setloglevel = 6
+
+DefVar $InstallerFile$
+DefVar $LogDir$
+DefVar $ProductId$
+DefVar $ProductVersion$
+DefVar $MinimumSpace$
+DefVar $InstallDir$
+DefVar $ExitCode$
+DefVar $ErrorMsg$
+DefVar $ProductName$
+DefVar $RegId$
+DefVar $systemarch$
+DefVar $MSVersion$
+DefVar $MsiSilentOption$
+DefVar $MsiOptions$
+DefVar $ClassicStart$
+DefVar $ClassicExplorer$
+DefVar $ClassicIE$
+DefVar $AddLocal$
+DefVar $RegPathUninstall$
+DefVar $SearchPattern$
+DefStringList $ResultList32$
+DefStringList $ResultList64$
+
+Set $LogDir$ = "%opsiLogDir%"
+
+Set $systemarch$ = GetSystemType
+Set $MSVersion$	 = GetMsVersionInfo
+
+Set $MsiSilentOption$ = GetProductProperty("msi_silent_option","/qb!")
+
+Set $ProductVersion$	= strPart("%installingProdVersion%", "1", calculate(strPos("%installingProdVersion%","-") + "-" + "1" ))
+Set $ProductVersion$  = stringReplace($ProductVersion$, ".", "_")
+
+if (GetSystemType = "x86 System")
+  Set $systemarch$ = "32"
+else
+  Set $systemarch$ = "64"
+endif
+
+Set $ClassicStart$ = GetProductProperty("classicstartmenu", "true")
+Set $ClassicExplorer$ = GetProductProperty("classicexplorer", "false")
+Set $ClassicIE$ = GetProductProperty("classicie", "false")
+
+if ($ClassicStart$ = "true")
+  if ($AddLocal$ = "")
+    set $AddLocal$ = "ClassicStartMenu"
+  else
+    set $AddLocal$ = $AddLocal$ + ",ClassicStartMenu"
+  endif
+endif
+
+if ($ClassicExplorer$ = "true")
+  if ($AddLocal$ = "")
+    set $AddLocal$ = "ClassicExplorer"
+  else
+    set $AddLocal$ = $AddLocal$ + ",ClassicExplorer"
+  endif
+endif
+
+if ($ClassicIE$ = "true")
+  if ($AddLocal$ = "")
+    set $AddLocal$ = "ClassicIE"
+  else
+    set $AddLocal$ = $AddLocal$ + ",ClassicIE"
+  endif
+endif
+
+
+; ----------------------------------------------------------------
+; - Please edit the following values                             -
+; ----------------------------------------------------------------
+Set $ProductId$	= "classic-shell"
+Set $ProductName$       = "Classic Shell"
+Set $MinimumSpace$	= "20 MB"
+Set $RegPathUninstall$	= "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"
+Set $InstallerFile$		= "%ScriptPath%" + "\ClassicShellSetup" + $systemarch$ + "_" + $ProductVersion$ + ".msi"
+Set $MsiOptions$ = $MsiSilentOption$ + " /i " + $InstallerFile$ + " ADDLOCAL=" + $AddLocal$ + " /norestart"
+Set $SearchPattern$ = $ProductName$
+; ----------------------------------------------------------------
+
+include_append "check_msi_exitcode.opsiinc"
+include_append "section_sub_search_registry32_uninstall_keys.opsiinc"
+include_append "section_sub_search_registry64_uninstall_keys.opsiinc"
+
+if not ($MSVersion$ = "6.2")
+	Logwarning "Only tested with windows 8.1! Please report to the maintainer successful installation on other windows versions."
+endif

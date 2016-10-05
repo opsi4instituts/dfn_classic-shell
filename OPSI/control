@@ -1,0 +1,59 @@
+[Package]
+version: 1
+depends: 
+incremental: False
+
+[Product]
+type: localboot
+id: dfn_classic-shell
+name: Classic Shell
+description: 
+advice: 
+version: 4.3.0
+priority: 0
+licenseRequired: False
+productClasses: 
+setupScript: setup.opsiscript
+uninstallScript: uninstall.opsiscript
+updateScript: 
+alwaysScript: 
+onceScript: 
+customScript: 
+userLoginScript: 
+
+[ProductProperty]
+type: bool
+name: classicstartmenu
+description: Install the Classic Start Menu
+default: True
+
+[ProductProperty]
+type: bool
+name: classicexplorer
+description: Install the Classic Explorer
+default: False
+
+[ProductProperty]
+type: bool
+name: classicie
+description: Install the Classic Internet Explorer
+default: False
+
+[ProductProperty]
+type: unicode
+name: msi_silent_option
+multivalue: False
+editable: False
+description: Un/Install MSI silent (/qb!) or very silent (/qn)
+values: ["/qb!", "/qn"]
+default: ["/qb!"]
+
+[Changelog]
+classic-shell (4.3.0-1) testing; urgency=low
+
+  * Initial package
+
+ -- Daniel Bacher <daniel.bacher@kit.edu>  Fri, 12 Aug 2016 12:04:10 +0000
+
+
+

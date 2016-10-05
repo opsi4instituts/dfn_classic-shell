@@ -1,0 +1,37 @@
+
+
+; Created by Daniel Bacher (bacher@kit.edu)
+
+; Copyright (c) uib gmbh (www.uib.de)
+; This sourcecode is owned by uib
+; and published under the Terms of the General Public License.
+; credits: http://www.opsi.org/credits/
+
+[Actions]
+
+include_insert "common.opsiinc"
+
+if not(HasMinimumSpace ("%SystemDrive%", $MinimumSpace$))
+	LogError "Not enough space on %SystemDrive%, " + $MinimumSpace$ + " on drive %SystemDrive% needed for " + $ProductId$
+	isFatalError
+	; Stop process and set installation status to failed
+else
+	Message "Installing %installingProdName% (%installingProdVersion%)"
+
+	comment "Show product picture"
+	ShowBitmap "%ScriptPath%\" + $ProductId$ + ".png" $ProductName$
+
+	if FileExists("%ScriptPath%\delsub.opsiscript")
+		comment "Start uninstall sub section"
+		Sub "%ScriptPath%\delsub.opsiscript"
+	endif
+
+  comment "Start Setup"
+  Winbatch_Install
+
+	comment "Test for installation success"
+  sub_check_exitcode
+endif
+
+[Winbatch_Install]
+msiexec $msioptions$
